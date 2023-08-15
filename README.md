@@ -1,91 +1,63 @@
-# RandomChooser Smart Contract
+# Ether Faucet with Merkle Proof Authentication
 
-## Description
-
-`RandomChooser` is a simple solidity contract designed to randomise numbers and store the result on-chain. It uses the Fisher-Yates shuffle algorithm for randomisation.
-
-Please note, this contract doesn't use any Verifiable Random Function (VRF). Hence, it's a naive implementation of randomisation and shouldn't be used for scenarios where the randomness needs to be unpredictable and tamper-proof.
-
-## Setup and Deployment
-
-This project uses the Hardhat development environment for compilation, testing, and deployment of the contract. It uses several environment variables for configuration, which are set in a `.env` file.
-
-### Prerequisites
-
-- Node.js and npm installed (Node.js version 14 or higher)
-- An Infura account (for the API key)
-- An Etherscan account (for the API key)
-- A CoinMarketCap account (for the API key)
-- A wallet with some test ETH (for the private key)
-
-### Setup
-
-1. Clone this repository to your local machine.
-2. Navigate to the root directory of the project in your terminal.
-3. Run `npm install` to install all the dependencies.
-4. Create a `.env` file in the root directory of your project.
-5. Set the following environment variables in the `.env` file:
-
-  ```bash
-  INFURA_API_KEY=<Infura API key>
-  DEPLOYER_PK=<wallet pk>
-  ETHERSCAN_API_KEY=<Etherscan API key>
-  COINMARKETCAP_API_KEY=<CoinMarketCap API key>
-  ```
-
-  Replace `<Your Infura API key>`, `<Your wallet's private key>`, `<Your Etherscan API key>`, and `<Your CoinMarketCap API key>` with your actual keys and private key.
-
-### Deployment
-
-This contract can be deployed to different networks including Goerli, Fuji, and Mainnet. To deploy the contract, run:
-
-```bash
-npx hardhat run scripts/deploy.js --network <network>
-```
-
-Replace `<network>` with either goerli, fuji, or mainnet depending on the network you want to deploy to.
-
-After the contract is deployed, Hardhat will verify the contract on Etherscan and print the contract address in the console.
+This project introduces an Ethereum-based smart contract called `EtherFaucet`, which dispenses ether to users. To ensure controlled distribution, the faucet uses a Merkle Tree mechanism, allowing only pre-approved addresses to claim ether.
 
 ## Features
 
-1. `randomiseSequence`: This function accepts a sequence of numbers, randomises them, and stores the result against a provided key.
+- **Merkle Tree Authentication**: Only addresses that are part of an initial Merkle tree can request ether.
+- **Cooldown Mechanism**: Users have to wait for a set cooldown time before requesting ether again.
+- **Owner Controls**: The contract owner can set drip amount, cooldown time, and withdraw excess ether.
 
-2. `viewResults`: This function allows you to retrieve the randomised results stored against a given key.
+## Prerequisites
 
-## How to use
+- [Node.js](https://nodejs.org/)
+- [Hardhat](https://hardhat.org/)
+- [Ethers.js](https://docs.ethers.io/v5/)
+- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts)
 
-### randomiseSequence
+## Setup
 
-Use this function to randomise a sequence of numbers.
+1. **Installation**:
 
-#### Parameters - randomiseSequence
+    ```bash
+    npm install
+    ```
 
-- `key`: A string value which acts as the identifier for each randomised sequence.
-- `resultLimit`: A uint value representing the total number of results to produce.
-- `array`: An array of numbers to randomise.
+2. **Compile Contracts**:
 
-#### Requirements
+    ```bash
+    npx hardhat compile
+    ```
 
-- The length of the array must be at least equal to the `resultLimit`.
-- The result for the key should not already exist.
+3. **Run Tests**:
 
-### viewResults
+    ```bash
+    npx hardhat test
+    ```
 
-Use this function to view the randomised results for a given key.
+## Usage
 
-#### Parameters - viewResults
+1. **Generating the Merkle Tree**:
 
-- `key`: The key for which you want to view the results.
+    Before deploying the contract, generate the Merkle Tree of approved addresses using a utility like `merkletreejs`. This will give you the Merkle Root to initialize the contract with.
 
-## Event
+2. **Deploying the Contract**:
 
-- `RandomComplete`: This event is emitted when a randomisation process completes. It includes the sender's address and the randomised result.
+    Deploy the contract with the obtained Merkle Root:
 
-## License
+    ```javascript
+    const EtherFaucet = await ethers.getContractFactory("EtherFaucet");
+    const faucet = await EtherFaucet.deploy(merkleRoot);
+    ```
 
-This project is licensed under the MIT License.
+3. **Requesting Ether**:
 
-## Author
+    Approved addresses can request ether by providing a Merkle Proof:
 
-Henry [@gitpancake](https://github.com/gitpancake)
+    ```javascript
+    await faucet.requestEther(merkleProof);
+    ```
+
+## Notes
+
+Ensure the faucet is periodically funded if it's expected to receive a high volume of requests. Always deploy and test on testnets before the mainnet to avoid any loss of funds.

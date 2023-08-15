@@ -3,9 +3,13 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const randomChooser = await ethers.deployContract("RandomChooser");
+  const EtherFaucet = await ethers.getContractFactory("EtherFaucet");
 
-  console.log("Random chooser address:", await randomChooser.getAddress());
+  const root = "0xfb5c8bbb58da751f6ff2fae4d5c625b55ceb3c001318c30897b2da132f1adf20";
+
+  const faucet = await EtherFaucet.deploy(root);
+
+  console.log("Faucet Address:", await faucet.getAddress());
 }
 
 main()
