@@ -20,7 +20,16 @@ console.log(`
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.21",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+  },
+
   networks: {
     goerli: {
       url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,

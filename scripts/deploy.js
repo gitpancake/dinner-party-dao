@@ -9,7 +9,13 @@ async function main() {
 
   const faucet = await EtherFaucet.deploy(root);
 
-  console.log("Faucet Address:", await faucet.getAddress());
+  const address = await faucet.getAddress();
+
+  console.log(`- - - -`);
+  console.log(`https://goerli.etherscan.io/address/${address}`);
+  console.log(`-`);
+  console.log(`npx hardhat verify --network goerli ${address} ${root}`);
+  console.log(`- - - -`);
 }
 
 main()

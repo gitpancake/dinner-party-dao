@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { parseEther, zeroAddress } = require("viem");
+const { parseEther } = require("viem");
 
 describe("EtherFaucet", function () {
   it("Should deploy the contract and set a balance", async function () {
@@ -11,7 +11,7 @@ describe("EtherFaucet", function () {
 
     const contractAddress = await faucet.getAddress();
 
-    const [owner] = await ethers.getSigners();
+    const [owner, addr1] = await ethers.getSigners();
 
     expect(await faucet.owner()).to.equal(owner.address);
 
@@ -20,17 +20,34 @@ describe("EtherFaucet", function () {
       value: parseEther("1000"), // Sends exactly 1.0 ether
     });
 
-    expect(await faucet.getAddress()).to.equal(contractAddress);
-    expect(await faucet.balance()).to.equal("1000000000000000000000");
+    const provider = ethers.provider;
+
+    let balance = await provider.getBalance(contractAddress);
+
+    expect(balance).to.equal(parseEther("1000"));
+
+    const disperseTx = await faucet.disperse(addr1.address, parseEther("100"));
+
+    await disperseTx.wait();
+
+    balance = await provider.getBalance(contractAddress);
+
+    expect(balance).to.equal(parseEther("900"));
+
+    const setDripAmountTx = await faucet.setDripAmount(parseEther("5"));
+
+    await setDripAmountTx.wait();
 
     const proof = "0xf7c151327ca22035527956655fa853a70809db355f7010441eef9043cb328114";
 
-    const requestEtherTx = await faucet.requestEther([proof]);
+    let dripTx = await faucet.drip([proof]);
 
     // wait until the transaction is mined
-    await requestEtherTx.wait();
+    await dripTx.wait();
 
-    expect(await faucet.balance()).to.equal("999000000000000000000");
+    balance = await provider.getBalance(contractAddress);
+
+    expect(balance).to.equal(parseEther("895"));
 
     const newRoot = "0xfb5c8bbb58da751f6ff2fae4d5c625b55ceb3c001318c30897b2da132f1adf20";
 
@@ -39,6 +56,18 @@ describe("EtherFaucet", function () {
     await updateTx.wait();
 
     expect(await faucet.merkleRoot()).to.equal(newRoot);
+
+    try {
+      dripTx = await faucet.drip([proof]);
+
+      // wait until the transaction is mined
+      await dripTx.wait();
+
+      expect(true).to.equal(false);
+    } catch (ex) {
+      expect(ex.message).to.equal(`VM Exception while processing transaction: reverted with reason string 'Wait for the cooldown to request again'`);
+    }
+
     // const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
 
     // // wait until the transaction is mined
