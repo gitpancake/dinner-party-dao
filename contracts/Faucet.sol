@@ -24,6 +24,8 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 contract EtherFaucet is ReentrancyGuard {
     address public owner;
     uint256 public dripAmount = 1 ether;
+    bool active = true;
+
     mapping(address => uint256) public lastAccessTime;
 
     uint256 public cooldownTime = 60 minutes;
@@ -59,6 +61,10 @@ contract EtherFaucet is ReentrancyGuard {
 
     function setCooldownTime(uint256 newCooldownTime) external onlyOwner {
         cooldownTime = newCooldownTime;
+    }
+
+    function setActive(bool _active) external onlyOwner {
+        active = _active;
     }
 
     function drain() external onlyOwner { 
