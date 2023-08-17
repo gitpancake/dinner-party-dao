@@ -46,6 +46,7 @@ contract EtherFaucet is ReentrancyGuard {
     receive() external payable {}
 
     function drip(bytes32[] memory proof) external nonReentrant {
+        require(active, "Faucet is not active. Thank you, come back later.");
         require(address(this).balance >= dripAmount, "Insufficient balance in faucet");
         require(lastAccessTime[msg.sender] + cooldownTime < block.timestamp, "Wait for the cooldown to request again");
         require(verifyProof(proof, msg.sender), "Invalid Merkle Proof");
