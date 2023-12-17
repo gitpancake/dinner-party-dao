@@ -15,8 +15,11 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
+    "base64-sol": "^1.1.0",
+    "chai": "^4.3.10",
     "dotenv": "^16.3.1",
     "ethers": "^6.7.1",
+    "solc": "^0.8.21",
     "viem": "^1.6.0"
   }
 }

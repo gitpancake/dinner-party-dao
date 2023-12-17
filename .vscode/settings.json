@@ -1,0 +1,5 @@
+{
+	"solidity.compileUsingRemoteVersion": "v0.8.23+commit.f704f362",
+	"solidity.defaultCompiler": "remote",
+	"solidity.compileUsingLocalVersion": "/Users/henrypye/Documents/code/bright-moments/goerli-faucet/soljson-v0.8.21+commit.d9974bed.js"
+}

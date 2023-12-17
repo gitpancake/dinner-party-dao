@@ -21,8 +21,9 @@ console.log(`
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.21",
+    version: "0.8.23",
     settings: {
+      viaIR: true,
       optimizer: {
         enabled: true,
         runs: 1000,
@@ -35,19 +36,23 @@ module.exports = {
       url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [DEPLOYER_PK],
     },
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [DEPLOYER_PK],
+    },
     fuji: {
       url: `https://avalanche-fuji.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [DEPLOYER_PK],
     },
-    mainnet: {
+    ethereum: {
       url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [DEPLOYER_PK],
     },
   },
   gasReporter: {
     enabled: true,
-    gasPrice: 100,
-    currency: "EUR",
+    gasPrice: 33,
+    currency: "USD",
     coinmarketcap: COINMARKETCAP_API_KEY,
   },
   etherscan: {
